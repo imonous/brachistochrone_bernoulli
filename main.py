@@ -14,13 +14,14 @@ def calc_err(expect, real):
 
 
 if __name__ == "__main__":
-    HEIGHT = 30
-    WIDTH = 100
-    PARTS = 100
+    HEIGHT = 3
+    WIDTH = 10
+    PARTS = 10**6
 
     min_err = math.inf
-    for init_angle in np.linspace(0, math.pi / 2, 100):
-        t = 0.0001
+    # for init_angle in np.linspace(0, math.pi / 2, 100):
+    for init_angle in [math.pi / 6]:
+        t = 1e-30
         x, y = 0, 0
         angle = init_angle
         v, v_old = 0, 0
