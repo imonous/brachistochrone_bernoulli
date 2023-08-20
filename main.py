@@ -20,41 +20,36 @@ def trace_light(init_angle, height, width, parts):
     init = True
     for _ in range(PARTS - 1):
         v = part_v(t)
-
-        # 1 / v * sin(angle) = 1 / v_new * sin(angle_new)
-        # new_angle = arcsin(v_new / v * sin(angle))
         if not init:
             w = v / v_old * math.sin(angle)
             w = w % 1 if w != 1 else 1 # fix domain
             angle = math.asin(w)
-
-        # cos(a) = height / long; long = height / cos(a)
         d = (HEIGHT / PARTS) / math.cos(angle) 
-
-        # d = vt; t = d / v
         t += d / v
-
-        # sin(a) = width / long; x += sin(a) * long; y += height
         x += math.sin(angle) * d
         y += HEIGHT / PARTS
-
-        if init:
-            init = False
         v_old = v
+        init = False
     return x, y
 
 
 if __name__ == "__main__":
     HEIGHT = 3
     WIDTH = 10
-    PARTS = 10**6
+    PARTS = 10**4
 
-    min_err = math.inf
-    # for init_angle in np.linspace(0, math.pi / 2, 100):
-    for init_angle in [math.pi / 6]:
+    min_err, min_angle = math.inf, math.inf
+    for init_angle in np.linspace(0, math.pi / 2, 100):
         x, y = trace_light(init_angle, HEIGHT, WIDTH, PARTS)
         err = calc_err((WIDTH, HEIGHT), (x, y))  
         if err < min_err:
-            min_err = err
-    print(min_err)
+            min_err, min_angle = err, init_angle
+    print(f"IT1: {min_err}, {min_angle}")
+
+    #for init_angle in np.linspace(0, math.pi / 2, 50):
+    #    x, y = trace_light(init_angle, HEIGHT, WIDTH, PARTS)
+    #    err = calc_err((WIDTH, HEIGHT), (x, y))  
+    #    if err < min_err:
+    #        min_err = err, min_angle = init_angle
+    #print(f"IT2: {min_err}")
 
