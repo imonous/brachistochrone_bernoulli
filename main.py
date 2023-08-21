@@ -1,6 +1,7 @@
 import numpy as np
 import math
 
+
 GRAV_ACC = 9.8067
 
 
@@ -14,25 +15,24 @@ def calc_err(expect, real):
     return math.sqrt(x**2 + y**2)
 
 
-def trace_light(init_angle, height, width, parts):
+def trace_light(init_angle, height, parts):
     t = 1e-30
     x, y = 0, 0
     angle = init_angle
     v, v_old = 0, 0
-    init = True
-    for _ in range(PARTS - 1):
+    for iter in range(PARTS - 1):
+        yield x, y
         v = part_v(t)
-        if not init:
+        if iter != 0:
             w = v / v_old * math.sin(angle)
-            w = w % 1 if w != 1 else 1  # fix domain
+            w = w % 1 if w != 1 else 1  # domain fix
             angle = math.asin(w)
-        d = (HEIGHT / PARTS) / math.cos(angle)
+        d = (height / parts) / math.cos(angle)
         t += d / v
         x += math.sin(angle) * d
-        y += HEIGHT / PARTS
+        y += height / parts
         v_old = v
-        init = False
-    return x, y
+    yield x, y  # final point
 
 
 if __name__ == "__main__":
@@ -46,11 +46,4 @@ if __name__ == "__main__":
         err = calc_err((WIDTH, HEIGHT), (x, y))
         if err < min_err:
             min_err, min_angle = err, init_angle
-    print(f"IT1: {min_err}, {min_angle}")
-
-    # for init_angle in np.linspace(0, math.pi / 2, 50):
-    #    x, y = trace_light(init_angle, HEIGHT, WIDTH, PARTS)
-    #    err = calc_err((WIDTH, HEIGHT), (x, y))
-    #    if err < min_err:
-    #        min_err = err, min_angle = init_angle
-    # print(f"IT2: {min_err}")
+    print(f"{min_err}, {min_angle}")
