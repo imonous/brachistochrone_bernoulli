@@ -36,8 +36,6 @@ def trace_light(init_angle, height, parts):
         travelled += height / parts
 
         v_old = v
-
-        print(angle)
     yield x, y  # final point
 
 
@@ -51,16 +49,19 @@ if __name__ == "__main__":
     mpl.use("module://mplcairo.gtk")
 
     HEIGHT = 10
-    # WIDTH = 30
+    WIDTH = 30
     PARTS = 10
 
     path = trace_light(0, HEIGHT, PARTS)
     x, y = zip(*path)
-    # plt.plot(x, y)
+    plt.scatter(x, y, zorder=1)
+
+    for n in np.linspace(0, HEIGHT, PARTS):
+        plt.axhline(n, color="gainsboro", zorder=0)
 
     # print(f"Error: {abs(x[-1] - WIDTH)}")
 
-    # plt.show()
+    plt.savefig("result.png", dpi=300)
 
     # min_err, min_angle = math.inf, math.inf
     # for init_angle in np.linspace(0, math.pi / 2, 100):
