@@ -1,49 +1,71 @@
 import numpy as np
 import math
 
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+from sys import float_info
+
 
 GRAV_ACC = 9.8067
 
 
-def part_v(t):
-    return GRAV_ACC * t
-
-
-def calc_err(expect, real):
-    x = abs(expect[0] - real[0])
-    y = abs(expect[1] - real[1])
-    return math.sqrt(x**2 + y**2)
+def part_v(y, g=GRAV_ACC):
+    return (2 * g * y) ** 0.5
 
 
 def trace_light(init_angle, height, parts):
-    t = 1e-30
-    x, y = 0, 0
+    travelled = float_info.min
+    x, y = 0, height
     angle = init_angle
     v, v_old = 0, 0
-    for iter in range(PARTS - 1):
+
+    for iter in range(parts):
         yield x, y
-        v = part_v(t)
+        v = part_v(travelled)
+
         if iter != 0:
             w = v / v_old * math.sin(angle)
-            w = w % 1 if w != 1 else 1  # domain fix
+            w = w % 1 if w % 1 != 0 else 1  # domain fix
             angle = math.asin(w)
+
         d = (height / parts) / math.cos(angle)
-        t += d / v
+
         x += math.sin(angle) * d
-        y += height / parts
+        y -= height / parts
+        travelled += height / parts
+
         v_old = v
+
+        print(angle)
     yield x, y  # final point
 
 
-if __name__ == "__main__":
-    HEIGHT = 3
-    WIDTH = 10
-    PARTS = 10**4
+trace_light(0, 10, 2)
 
-    min_err, min_angle = math.inf, math.inf
-    for init_angle in np.linspace(0, math.pi / 2, 100):
-        x, y = trace_light(init_angle, HEIGHT, WIDTH, PARTS)
-        err = calc_err((WIDTH, HEIGHT), (x, y))
-        if err < min_err:
-            min_err, min_angle = err, init_angle
-    print(f"{min_err}, {min_angle}")
+
+if __name__ == "__main__":
+    import gi
+
+    gi.require_version("Gtk", "3.0")
+    mpl.use("module://mplcairo.gtk")
+
+    HEIGHT = 10
+    # WIDTH = 30
+    PARTS = 10
+
+    path = trace_light(0, HEIGHT, PARTS)
+    x, y = zip(*path)
+    # plt.plot(x, y)
+
+    # print(f"Error: {abs(x[-1] - WIDTH)}")
+
+    # plt.show()
+
+    # min_err, min_angle = math.inf, math.inf
+    # for init_angle in np.linspace(0, math.pi / 2, 100):
+    #     x, y = trace_light(init_angle, HEIGHT, PARTS)
+    #     err = abs(x[-1] - WIDTH)
+    #     if err < min_err:
+    #         min_err, min_angle = err, init_angle
+    # print(f"Err={min_err}, Angle={min_angle}")
