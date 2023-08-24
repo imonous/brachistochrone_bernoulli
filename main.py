@@ -60,28 +60,14 @@ if __name__ == "__main__":
     mpl.use("module://mplcairo.gtk")
 
     HEIGHT = 10
-    # WIDTH = 30
     PARTS = 100
 
-    # path = trace_light(float_info.min, HEIGHT, PARTS)
-    # x, y = zip(*path)
-    # plt.plot(x, y, zorder=1)
+    path = trace_light(float_info.min, HEIGHT, PARTS)
+    x, y = zip(*path)
+    plt.plot(x, y, zorder=1)
 
-    # for n in np.linspace(0, HEIGHT, PARTS + 1):
-    #     plt.axhline(n, color="gainsboro", zorder=0)
-
-    # min_err, min_angle = math.inf, math.inf
-    # for init_angle in np.linspace(float_info.min, math.pi / 2, 100):
-    #     path = trace_light(init_angle, HEIGHT, PARTS)
-    #     try:
-    #         x, y = zip(*path)
-    #     except:
-    #         print(init_angle)
-    #         continue
-    #     err = abs(x[-1] - WIDTH)
-    #     if err < min_err:
-    #         min_err, min_angle = err, init_angle
-    # print(f"Err={min_err}, Angle={min_angle}")
+    for n in np.linspace(0, HEIGHT, PARTS + 1):
+        plt.axhline(n, color="gainsboro", zorder=0)
 
     plt.ylim(HEIGHT, 0)
     plt.savefig("result.png", dpi=300)
