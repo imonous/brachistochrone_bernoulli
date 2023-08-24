@@ -4,6 +4,8 @@ import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from scipy.optimize import newton
+
 from sys import float_info
 
 
@@ -15,33 +17,40 @@ def part_v(y, g=GRAV_ACC):
 
 
 def trace_light(init_angle, height, parts):
-    travelled = float_info.min
-    x, y = 0, height
+    x, y = 0, float_info.min
     angle = init_angle
     v, v_old = 0, 0
-    down = True
 
     for iter in range(parts):
         yield x, y
-        v = part_v(travelled)
+        v = part_v(y)
 
         if iter != 0:
             w = v / v_old * math.sin(angle)
-            if w < 1:
-                angle = math.asin(w)
-            else:  # total internal reflection
-                down = not down
+            angle = math.asin(w)
 
         x += (height / parts) * math.tan(angle)
-        if down:
-            y -= height / parts
-            travelled += height / parts
-        else:
-            y += height / parts
-            travelled -= height / parts
+        y += height / parts
 
         v_old = v
     yield x, y  # final point
+
+
+def cycloid(x2, y2, N=100):
+    # First find theta2 from (x2, y2) numerically (by Newton-Rapheson).
+    def f(theta):
+        return y2 / x2 - (1 - np.cos(theta)) / (theta - np.sin(theta))
+
+    theta2 = newton(f, np.pi / 2)
+
+    # The radius of the circle generating the cycloid.
+    R = y2 / (1 - np.cos(theta2))
+
+    theta = np.linspace(0, theta2, N)
+    x = R * (theta - np.sin(theta))
+    y = R * (1 - np.cos(theta))
+
+    return x, y
 
 
 if __name__ == "__main__":
@@ -54,19 +63,12 @@ if __name__ == "__main__":
     # WIDTH = 30
     PARTS = 100
 
-    # y = list(trace_light(float_info.min, HEIGHT, PARTS))
-    # x = range(len(y))
-    # plt.scatter(x, y)
-    # plt.show()
+    # path = trace_light(float_info.min, HEIGHT, PARTS)
+    # x, y = zip(*path)
+    # plt.plot(x, y, zorder=1)
 
-    path = trace_light(float_info.min, HEIGHT, PARTS)
-    x, y = zip(*path)
-    plt.plot(x, y, zorder=1)
-
-    for n in np.linspace(0, HEIGHT, PARTS + 1):
-        plt.axhline(n, color="gainsboro", zorder=0)
-
-    #  print(f"Error: {abs(x[-1] - WIDTH)}")
+    # for n in np.linspace(0, HEIGHT, PARTS + 1):
+    #     plt.axhline(n, color="gainsboro", zorder=0)
 
     # min_err, min_angle = math.inf, math.inf
     # for init_angle in np.linspace(float_info.min, math.pi / 2, 100):
@@ -81,4 +83,5 @@ if __name__ == "__main__":
     #         min_err, min_angle = err, init_angle
     # print(f"Err={min_err}, Angle={min_angle}")
 
+    plt.ylim(HEIGHT, 0)
     plt.savefig("result.png", dpi=300)
