@@ -66,6 +66,19 @@ def cycloid(x2, y2, N=100):
     return x, y
 
 
+def format_data(data):
+    output = ""
+    for entry in data:
+        angle, x, y = entry.values()
+        angle, x, y = (
+            format(angle, ".4f"),
+            [format(n, ".4e") for n in x],
+            [format(n, ".4e") for n in y],
+        )
+        output += f"ANGLE: {angle}\nx: {x}\ny: {y}\n\n"
+    return output[:-2]  # trim last \n
+
+
 if __name__ == "__main__":
     import gi
 
@@ -77,14 +90,18 @@ if __name__ == "__main__":
     for y2 in np.linspace(0.1, 2, 4):
         x, y = cycloid(1, y2)
         y *= -1
-        raw_data.append((x, y))
+        angle = (math.pi / 2) - ((y2 / 2) * (math.pi / 2))
+        print(angle)
+        raw_data.append({"angle": angle, "x": x, "y": y})
 
+    data = format_data(raw_data)
     with open(f"{PATH}/raw_data.txt", "w") as file:
-        file.write(str(raw_data))
+        file.write(data)
 
-    # for x, y in raw_data:
+    # for entry in raw_data:
+    #     _, x, y = entry.values()
     #     plt.plot(x, y)
     # lim = max(max(x), max(abs(y)))
     # plt.xlim(0, lim)
     # plt.ylim(-lim, 0)
-    # plt.savefig("processed_data.png", dpi=300)
+    # plt.savefig(f"{PATH}/processed_data.png", dpi=300)
