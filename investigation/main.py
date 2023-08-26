@@ -10,6 +10,7 @@ from sys import float_info
 
 
 GRAV_ACC = 9.8067
+PATH = "/home/anon/Programming/projects/brachistochrone_bernoulli/investigation"
 
 
 def part_v(y, g=GRAV_ACC):
@@ -36,14 +37,26 @@ def trace_light(init_angle, height, parts):
     yield x, y  # final point
 
 
+# HEIGHT = 10
+# PARTS = 100
+
+# path = trace_light(float_info.min, HEIGHT, PARTS)
+# x, y = zip(*path)
+# plt.plot(x, y, zorder=1)
+
+# for n in np.linspace(0, HEIGHT, PARTS + 1):
+#     plt.axhline(n, color="gainsboro", zorder=0)
+
+# plt.ylim(HEIGHT, 0)
+# plt.savefig("result.png", dpi=300)
+
+
 def cycloid(x2, y2, N=100):
-    # First find theta2 from (x2, y2) numerically (by Newton-Rapheson).
     def f(theta):
         return y2 / x2 - (1 - np.cos(theta)) / (theta - np.sin(theta))
 
     theta2 = newton(f, np.pi / 2)
 
-    # The radius of the circle generating the cycloid.
     R = y2 / (1 - np.cos(theta2))
 
     theta = np.linspace(0, theta2, N)
@@ -59,15 +72,19 @@ if __name__ == "__main__":
     gi.require_version("Gtk", "3.0")
     mpl.use("module://mplcairo.gtk")
 
-    HEIGHT = 10
-    PARTS = 100
+    raw_data = []
+    x2 = 1
+    for y2 in np.linspace(0.1, 2, 4):
+        x, y = cycloid(1, y2)
+        y *= -1
+        raw_data.append((x, y))
 
-    path = trace_light(float_info.min, HEIGHT, PARTS)
-    x, y = zip(*path)
-    plt.plot(x, y, zorder=1)
+    with open(f"{PATH}/raw_data.txt", "w") as file:
+        file.write(str(raw_data))
 
-    for n in np.linspace(0, HEIGHT, PARTS + 1):
-        plt.axhline(n, color="gainsboro", zorder=0)
-
-    plt.ylim(HEIGHT, 0)
-    plt.savefig("result.png", dpi=300)
+    # for x, y in raw_data:
+    #     plt.plot(x, y)
+    # lim = max(max(x), max(abs(y)))
+    # plt.xlim(0, lim)
+    # plt.ylim(-lim, 0)
+    # plt.savefig("processed_data.png", dpi=300)
