@@ -79,6 +79,10 @@ def format_data(data):
     return output[:-2]  # trim last \n
 
 
+def percentage_error(x, y):
+    pass
+
+
 if __name__ == "__main__":
     import gi
 
@@ -87,15 +91,15 @@ if __name__ == "__main__":
 
     raw_data = []
     angles = np.linspace(5, 85, 17)
-    print(angles)
-    for it, y2 in enumerate(np.linspace(0.5, 3, 17)):
+    # for it, y2 in enumerate(np.linspace(0.5, 3, 17)):
+    for it, y2 in [(0, 1)]:
         x, y = cycloid(1, y2)
         y *= -1
         raw_data.append({"angle": angles[it], "x": x, "y": y})
 
-    data = format_data(raw_data)
-    with open(f"{PATH}/raw_data.txt", "w") as file:
-        file.write(data)
+    # data = format_data(raw_data)
+    # with open(f"{PATH}/raw_data.txt", "w") as file:
+    #     file.write(data)
 
     for entry in raw_data:
         _, x, y = entry.values()
@@ -103,4 +107,16 @@ if __name__ == "__main__":
     lim = max(max(x), max(abs(y)))
     plt.xlim(0, lim)
     plt.ylim(-lim, 0)
-    plt.savefig(f"{PATH}/processed_data.png", dpi=300)
+
+    coefficients = np.polyfit(x, y, 4)
+    poly = np.poly1d(coefficients)
+    plt.plot(x, poly(x), linestyle="--", label="fitted function")
+
+    # plt.title("Path traced by ray for N={5deg, 10deg, ..., 85deg}, M=100")
+    plt.title("Path (+fit) traced by ray for N={5deg, 10deg, ..., 85deg}, M=100")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.tight_layout()
+    # plt.savefig(f"{PATH}/processed_data.png", dpi=300)
+    plt.legend()
+    plt.savefig(f"{PATH}/fitted_data.png", dpi=300)
