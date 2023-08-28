@@ -94,7 +94,7 @@ if __name__ == "__main__":
     mpl.use("module://mplcairo.gtk")
 
     raw_data = []
-    angles = np.linspace(5, 85, 17)
+    angles = np.linspace(5, 85, 17)[::-1]
     for it, y2 in enumerate(np.linspace(0.5, 3, 17)):
         # for it, y2 in [(0, 1)]:
         x, y = cycloid(1, y2)
@@ -113,6 +113,9 @@ if __name__ == "__main__":
         plt.ylabel("y")
         plt.tight_layout()
         plt.legend()
+
+        plt.xlim(0, 3)
+        plt.ylim(-3, 0)
 
         plt.savefig(f"{PATH}/fitted_data{it}.png", dpi=300)
         plt.clf()
