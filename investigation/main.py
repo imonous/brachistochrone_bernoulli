@@ -79,8 +79,12 @@ def format_data(data):
     return output[:-2]  # trim last \n
 
 
-def percentage_error(x, y):
-    pass
+def percentage_error(y, y_fit):
+    y, y_fit = y[1:], y_fit[1:]
+    PE = np.abs((y - y_fit) / y)
+    PE = np.insert(PE, 0, 1)
+    print(PE)
+    return np.mean(PE)
 
 
 if __name__ == "__main__":
@@ -91,32 +95,47 @@ if __name__ == "__main__":
 
     raw_data = []
     angles = np.linspace(5, 85, 17)
-    # for it, y2 in enumerate(np.linspace(0.5, 3, 17)):
-    for it, y2 in [(0, 1)]:
+    for it, y2 in enumerate(np.linspace(0.5, 3, 17)):
+        # for it, y2 in [(0, 1)]:
         x, y = cycloid(1, y2)
         y *= -1
         raw_data.append({"angle": angles[it], "x": x, "y": y})
+        plt.plot(x, y)
+
+        coefficients = np.polyfit(x, y, 4)
+        poly = np.poly1d(coefficients)
+        y_fit = poly(x)
+        plt.plot(x, y_fit, linestyle="--", label="fitted function")
+
+        angle = angles[it]
+        plt.title(f"Path (+fit) traced by ray for N={angle}, M=100")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.tight_layout()
+        plt.legend()
+
+        plt.savefig(f"{PATH}/fitted_data{it}.png", dpi=300)
+        plt.clf()
 
     # data = format_data(raw_data)
     # with open(f"{PATH}/raw_data.txt", "w") as file:
     #     file.write(data)
 
-    for entry in raw_data:
-        _, x, y = entry.values()
-        plt.plot(x, y)
-    lim = max(max(x), max(abs(y)))
-    plt.xlim(0, lim)
-    plt.ylim(-lim, 0)
-
-    coefficients = np.polyfit(x, y, 4)
-    poly = np.poly1d(coefficients)
-    plt.plot(x, poly(x), linestyle="--", label="fitted function")
+    # for entry in raw_data:
+    #     _, x, y = entry.values()
+    #     plt.plot(x, y)
+    # lim = max(max(x), max(abs(y)))
+    # plt.xlim(0, lim)
+    # plt.ylim(-lim, 0)
 
     # plt.title("Path traced by ray for N={5deg, 10deg, ..., 85deg}, M=100")
-    plt.title("Path (+fit) traced by ray for N={5deg, 10deg, ..., 85deg}, M=100")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.tight_layout()
+    # plt.title("Path (+fit) traced by ray for N={5deg, 10deg, ..., 85deg}, M=100")
+
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.tight_layout()
     # plt.savefig(f"{PATH}/processed_data.png", dpi=300)
-    plt.legend()
-    plt.savefig(f"{PATH}/fitted_data.png", dpi=300)
+    # plt.legend()
+
+    # PE = percentage_error(y, y_fit)
+    # print(PE)
