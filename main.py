@@ -10,7 +10,7 @@ from sys import float_info
 
 
 GRAV_ACC = 9.8067
-PATH = "/home/anon/Programming/projects/brachistochrone_bernoulli/investigation"
+PATH = "/home/anon/Programming/projects/brachistochrone_bernoulli/data"
 
 
 def part_v(y, g=GRAV_ACC):
