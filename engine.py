@@ -8,22 +8,29 @@ class LightMedium:
         """Light medium in terms of velocity."""
         self.v = v
 
+    def __repr__(self):
+        return f"LightMedium(v={self.v:.2e})"
+
 
 class BernoulliLightMedium(LightMedium):
-    def __init__(self, v, g=9.8067):
+    def __init__(self, y, g=9.8067):
         """
         A light medium from the Johann Bernoulli indirect method for the brachistochrone
         curve. It is meant to replicate gravity as a light ray passes through it.
         """
-        pass
+        self.v = self.v(y)
 
-    # def v(self, y):
-    #     return (2 * self.g * y) ** 0.5
+    def set_v(self, y: float) -> None:
+        """
+        Set the velocity of the medium in accordance to:
+                v = sqrt(2 * g * y).
+        """
+        self.v = (2 * self.g * y) ** 0.5
 
 
 class LightRay:
     def __init__(self, x: float, y: float):
-        """Light ray as a vector."""
+        """Light ray as a vector. Angles are in radians."""
         self.x, self.y = x, y
 
     def get_angle(self) -> float:
@@ -31,7 +38,12 @@ class LightRay:
         return math.atan(self.y / self.x)
 
     def set_angle(self, angle: float) -> None:
-        """Set the angle of the vector."""
+        """
+        Set the angle of the vector in the range [-pi / 2, pi / 2]. If the sign of angle
+        does not change, alter x. Otherwise, alter y and or x.
+        """
+        if math.copysign(angle, self.get_angle()) != angle:
+            self.y = -self.y
         self.x = self.y / math.tan(angle)
 
     def get_other_angle(self) -> float:
@@ -50,12 +62,12 @@ class LightRay:
 
     def reflect(self) -> None:
         """
-        Reflect the ray (off a ... surface) using the Law of Reflection:
+        Reflect the ray (...specify...) using the Law of Reflection:
             alpha_1 = alpha_2.
         """
         alpha_1 = self.get_other_angle()
         alpha_w = -alpha_1
-        alpha_2 = math.copysign(np.pi / 2 - abs(alpha_w), alpha_2)
+        alpha_2 = math.copysign(np.pi / 2 - abs(alpha_w), alpha_w)
         self.set_angle(alpha_2)
 
     def _refract(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
@@ -87,6 +99,5 @@ class LightRay:
             return False
         return True
 
-
-if __name__ == "__main__":
-    pass
+    def __repr__(self):
+        return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
