@@ -1,6 +1,4 @@
 import math
-import numpy as np
-from sys import float_info
 
 
 class LightMedium:
@@ -18,14 +16,15 @@ class BernoulliLightMedium(LightMedium):
         A light medium from the Johann Bernoulli indirect method for the brachistochrone
         curve. It is meant to replicate gravity as a light ray passes through it.
         """
-        self.v = self.v(y)
+        self.g = g
+        self.set_v(y)
 
     def set_v(self, y: float) -> None:
         """
         Set the velocity of the medium in accordance to:
                 v = sqrt(2 * g * y).
         """
-        self.v = (2 * self.g * y) ** 0.5
+        self.v = math.sqrt(2 * self.g * y)
 
 
 class LightRay:
@@ -35,7 +34,7 @@ class LightRay:
 
     def get_angle(self) -> float:
         """Get the angle of the vector."""
-        return math.atan(self.y / self.x)
+        return math.atan2(self.x, self.y)
 
     def set_angle(self, angle: float) -> None:
         """
@@ -52,7 +51,7 @@ class LightRay:
         function returns the other angle of that triangle.
         """
         angle = self.get_angle()
-        return math.copysign(np.pi / 2 - abs(angle), angle)
+        return math.copysign(math.pi / 2 - abs(angle), angle)
 
     def propagate(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """Propagate the ray from medium1 to medium2."""
@@ -67,7 +66,7 @@ class LightRay:
         """
         alpha_1 = self.get_other_angle()
         alpha_w = -alpha_1
-        alpha_2 = math.copysign(np.pi / 2 - abs(alpha_w), alpha_w)
+        alpha_2 = math.copysign(math.pi / 2 - abs(alpha_w), alpha_w)
         self.set_angle(alpha_2)
 
     def _refract(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
@@ -77,7 +76,7 @@ class LightRay:
         The propagate method should be used directly instead of this, as light is not
         always able to refract.
         """
-        alpha_1 = self.get_angle()
+        alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = v2 / v1 * math.sin(alpha_1)
         alpha_2 = math.asin(w)
@@ -92,7 +91,7 @@ class LightRay:
             alpha_2 = arcsin(v2 / v1 * sin(alpha_1)).
         If out of domain return False, otherwise True.
         """
-        alpha_1 = self.get_angle()
+        alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = v2 / v1 * math.sin(alpha_1)
         if abs(w) > 1:
