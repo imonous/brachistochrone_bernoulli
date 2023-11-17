@@ -22,9 +22,9 @@ class BernoulliLightMedium(LightMedium):
     def set_v(self, y: float) -> None:
         """
         Set the velocity of the medium in accordance to:
-                v = sqrt(2 * g * y).
+                v = sqrt(-2 * g * y).
         """
-        self.v = math.sqrt(2 * self.g * y)
+        self.v = math.sqrt(-2 * self.g * y)
 
 
 class LightRay:
@@ -34,7 +34,7 @@ class LightRay:
 
     def get_angle(self) -> float:
         """Get the angle of the vector."""
-        return math.atan2(self.x, self.y)
+        return math.atan2(self.y, self.x)
 
     def set_angle(self, angle: float) -> None:
         """
@@ -64,10 +64,7 @@ class LightRay:
         Reflect the ray (...specify...) using the Law of Reflection:
             alpha_1 = alpha_2.
         """
-        alpha_1 = self.get_other_angle()
-        alpha_w = -alpha_1
-        alpha_2 = math.copysign(math.pi / 2 - abs(alpha_w), alpha_w)
-        self.set_angle(alpha_2)
+        self.y = -self.y
 
     def _refract(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """
@@ -79,7 +76,8 @@ class LightRay:
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = v2 / v1 * math.sin(alpha_1)
-        alpha_2 = math.asin(w)
+        w = math.asin(w)
+        alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
         self.set_angle(alpha_2)
 
     def can_refract(
@@ -94,7 +92,7 @@ class LightRay:
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = v2 / v1 * math.sin(alpha_1)
-        if abs(w) > 1:
+        if w == 0 or abs(w) > 1:  # no total internal reflectoin
             return False
         return True
 
