@@ -2,7 +2,7 @@ import math
 import holoviews as hv
 import numpy as np
 
-hv.extension("bokeh")
+# hv.extension("bokeh")
 
 
 class LightMedium:
@@ -104,8 +104,11 @@ class LightRay:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
 
 
-def trace_light(iterations: int, medium_height: float) -> list[tuple[float, float]]:
-    ray = LightRay(x=1e-3, y=-medium_height)
+def trace_light(
+    iterations: int, medium_height: float, init_angle: float
+) -> list[tuple[float, float]]:
+    ray = LightRay(x=0, y=-medium_height)
+    ray.set_angle(init_angle)
     x, y = 0, ray.y
     points = [(0, 0), (ray.x, ray.y)]
     m1, m2 = BernoulliLightMedium(0), BernoulliLightMedium(0)
@@ -122,7 +125,7 @@ def trace_light(iterations: int, medium_height: float) -> list[tuple[float, floa
 
 
 def plot(
-    points, medium_height: float, file_path: str, save=True
+    points: list[tuple[float, float]], medium_height: float, file_path=None, save=False
 ) -> hv.core.layout.Layout:
     alim = np.max(np.abs(np.array(points)))
     # lines = hv.HLines(-np.arange(0, alim, medium_height)).opts(
