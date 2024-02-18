@@ -2,20 +2,22 @@ import math
 import holoviews as hv
 import numpy as np
 
+from typing import type
+
 # hv.extension("bokeh")
 
 
 class LightMedium:
-    def __init__(self, v):
+    def __init__(self, v: float) -> None:
         """Light medium in terms of velocity."""
         self.v = v
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"LightMedium(v={self.v:.2e})"
 
 
 class BernoulliLightMedium(LightMedium):
-    def __init__(self, y, g=9.8067):
+    def __init__(self, y: float, g: float = 9.8067) -> None:
         """
         A light medium from the Johann Bernoulli indirect method for the brachistochrone
         curve. It is meant to replicate gravity as a light ray passes through it.
@@ -32,7 +34,7 @@ class BernoulliLightMedium(LightMedium):
 
 
 class LightRay:
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float) -> None:
         """Light ray as a vector. Angles are in radians."""
         self.x, self.y = x, y
 
@@ -100,46 +102,46 @@ class LightRay:
             return False
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
 
 
-def trace_light(
-    iterations: int, medium_height: float, init_angle: float
-) -> list[tuple[float, float]]:
-    ray = LightRay(x=0, y=-medium_height)
-    ray.set_angle(init_angle)
-    x, y = 0, ray.y
-    points = [(0, 0), (ray.x, ray.y)]
-    m1, m2 = BernoulliLightMedium(0), BernoulliLightMedium(0)
-    for _ in range(iterations):
-        if y + ray.y >= 0:
-            break
-        m1.set_v(y)
-        m2.set_v(y + ray.y)
-        ray.propagate(m1, m2)
-        x += ray.x
-        y += ray.y
-        points.append((x, y))
-    return points
+# def trace_light(
+#     iterations: int, medium_height: float, init_angle: float
+# ) -> list[tuple[float, float]]:
+#     ray = LightRay(x=0, y=-medium_height)
+#     ray.set_angle(init_angle)
+#     x, y = 0, ray.y
+#     points = [(0, 0), (ray.x, ray.y)]
+#     m1, m2 = BernoulliLightMedium(0), BernoulliLightMedium(0)
+#     for _ in range(iterations):
+#         if y + ray.y >= 0:
+#             break
+#         m1.set_v(y)
+#         m2.set_v(y + ray.y)
+#         ray.propagate(m1, m2)
+#         x += ray.x
+#         y += ray.y
+#         points.append((x, y))
+#     return points
 
 
-def plot(
-    points: list[tuple[float, float]], medium_height: float, file_path=None, save=False
-) -> hv.core.layout.Layout:
-    alim = np.max(np.abs(np.array(points)))
-    # lines = hv.HLines(-np.arange(0, alim, medium_height)).opts(
-    #     color="lightgray", line_width=1
-    # )
+# def plot(
+#     points: list[tuple[float, float]], medium_height: float, file_path=None, save=False
+# ) -> hv.core.layout.Layout:
+#     alim = np.max(np.abs(np.array(points)))
+#     # lines = hv.HLines(-np.arange(0, alim, medium_height)).opts(
+#     #     color="lightgray", line_width=1
+#     # )
 
-    pad = 1e-1
-    xlim = (-alim * pad, alim + alim * pad)
-    ylim = (-alim - alim * pad, alim * pad)
-    curve = hv.Curve(points).opts(xlim=xlim, ylim=ylim, height=650, width=650)
+#     pad = 1e-1
+#     xlim = (-alim * pad, alim + alim * pad)
+#     ylim = (-alim - alim * pad, alim * pad)
+#     curve = hv.Curve(points).opts(xlim=xlim, ylim=ylim, height=650, width=650)
 
-    # res = lines * curve
-    res = curve
-    if save:
-        # show(hv.render(res))
-        hv.save(res, file_path, fmt="png")
-    return res
+#     # res = lines * curve
+#     res = curve
+#     if save:
+#         # show(hv.render(res))
+#         hv.save(res, file_path, fmt="png")
+#     return res
