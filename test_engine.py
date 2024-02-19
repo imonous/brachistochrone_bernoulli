@@ -56,40 +56,16 @@ def test_set_angle_fail(angle):
         ray.set_angle(angle)
 
 
-# def test_get_other_angle() -> bool:
-#     return True
+# def test_get_other_angle():
+# def test_propagate():
+# def test_reflect():
 
 
-# def test_propagate() -> bool:
-#     return True
-
-
-# def test_reflect() -> bool:
-#     return True
-
-
-c = 299792458  # m / s
-
-
-def n_to_v(n):
-    """
-    Convert refractive index to velocity.
-            n = c / v,
-            v = c / n.
-    """
-    return c / n
-
-
-# depends on engine.LightMedum, n_to_v, engine.set_angle, engine.get_other_angle
-# used https://www.omnicalculator.com/physics/snells-law
-#   for (1, 2, 3, 4, 5)
-# used https://www.allaboutcircuits.com/tools/snells-law-calculator-snells-law-equation/
-#   for ()
-# used https://www.translatorscafe.com/unit-converter/de-DE/calculator/snell-law/
-#   for ()
+# depends on engine.LightMedum, engine.set_angle, engine.get_other_angle
 @pytest.mark.parametrize(
     "n1, n2, angle, expected",
     [
+        # https://www.omnicalculator.com/physics/snells-law
         # n1 >= n2
         (1.000293, 1.000293, 0.7853981633974483, 0.785398),
         (1.333, 1.000293, 0.7853981633974483, 1.229427),
@@ -97,15 +73,18 @@ def n_to_v(n):
         # (1, 1.000293, 0.7853981633974483, 0.785105),
         # (1.229427, 2.419, 0.7853981633974483, 0.7853981633974483),
         # (1.229427, 2.419, 0.5235987755982988, 0.279138),
+        # https://www.allaboutcircuits.com/tools/snells-law-calculator-snells-law-equation/
+        # https://www.translatorscafe.com/unit-converter/de-DE/calculator/snell-law/
     ],
 )
 def test_refract_results(n1, n2, angle, expected):
+    v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
+    m1, m2 = LightMedium(v1), LightMedium(v2)
     r = LightRay(1, 1)
     r.set_angle(angle)
-    m1, m2 = LightMedium(n_to_v(n1)), LightMedium(n_to_v(n2))
     r._refract(m1, m2)
-    assert pytest.approx(r.get_other_angle(), abs=1e-3) == expected
+    assert pytest.approx(r.get_other_angle()) == expected
 
 
-# def test_can_refract() -> bool:
-#     return True
+# def test_can_refract():
+# def test_LightMedium():

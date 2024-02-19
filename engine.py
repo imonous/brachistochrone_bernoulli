@@ -6,9 +6,20 @@ import numpy as np
 
 
 class LightMedium:
+
     def __init__(self, v: float) -> None:
         """Light medium in terms of velocity."""
         self.v = v
+
+    @staticmethod
+    def n_to_v(n):
+        """
+        Convert refractive index to velocity.
+                n = c / v,
+                v = c / n.
+        """
+        c = 299792458  # m / s
+        return c / n
 
     def __repr__(self) -> str:
         return f"LightMedium(v={self.v:.2e})"
