@@ -69,7 +69,7 @@ class LightRay:
 
     def reflect(self) -> None:
         """
-        Reflect the ray (...specify...) using the Law of Reflection:
+        Reflect the ray using the Law of Reflection:
             alpha_1 = alpha_2.
         """
         self.y = -self.y
