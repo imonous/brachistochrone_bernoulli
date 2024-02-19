@@ -2,8 +2,6 @@ import math
 import holoviews as hv
 import numpy as np
 
-from typing import type
-
 # hv.extension("bokeh")
 
 
@@ -36,6 +34,8 @@ class BernoulliLightMedium(LightMedium):
 class LightRay:
     def __init__(self, x: float, y: float) -> None:
         """Light ray as a vector. Angles are in radians."""
+        if (x, y) == (0, 0):
+            raise ValueError("LightRay cannot be a null vector.")
         self.x, self.y = x, y
 
     def get_angle(self) -> float:
@@ -47,6 +47,8 @@ class LightRay:
         Set the angle of the vector in the range [-pi / 2, pi / 2]. If the sign of angle
         does not change, alter x. Otherwise, alter y and or x.
         """
+        if abs(angle) > math.pi / 2 or angle == 0:
+            raise ValueError("Angle outside of the domain.")
         if math.copysign(angle, self.get_angle()) != angle:
             self.y = -self.y
         self.x = self.y / math.tan(angle)
