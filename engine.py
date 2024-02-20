@@ -6,7 +6,6 @@ import numpy as np
 
 
 class LightMedium:
-
     def __init__(self, v: float) -> None:
         """Light medium in terms of velocity."""
         self.v = v
@@ -15,8 +14,8 @@ class LightMedium:
     def n_to_v(n):
         """
         Convert refractive index to velocity.
-                n = c / v,
-                v = c / n.
+            n = c / v,
+            v = c / n.
         """
         c = 299792458  # m / s
         return c / n
@@ -42,36 +41,41 @@ class BernoulliLightMedium(LightMedium):
         self.v = math.sqrt(-2 * self.g * y)
 
 
-class LightRay:
+class BernoulliRay:
     def __init__(self, x: float, y: float) -> None:
-        """Light ray as a vector in the 1st cartesian quadrant. Angles are in radians."""
+        """Light ray as a vector in the 1st cartesian quadrant. Angles are in radians.
+        Specifically made for the experiment."""
         if (x, y) == (0, 0):
-            raise ValueError("LightRay cannot be a null vector.")
+            raise ValueError("BernoulliRay cannot be a null vector.")
         if x < 0 or y < 0:
-            raise ValueError("LightRay must be in the first (cartesian) quadrant.")
+            raise ValueError("BernoulliRay must be in the first (cartesian) quadrant.")
         self._x, self._y = x, y
         self.reflected = False
 
     # TODO x, y = 0, 0?
     @property
     def x(self) -> float:
+        """Basic x getter."""
         return self._x
 
     @x.setter
     def x(self, value: float) -> None:
+        """Set x in the positive domain."""
         if value < 0:
-            raise ValueError("LightRay.x < 0 is invalid.")
+            raise ValueError("BernoulliRay.x < 0 is invalid.")
         self._x = value
 
     @property
     def y(self) -> float:
+        """Negate y if reflected."""
         return -1 * self._y if self.reflected else self._y
 
     @y.setter
     def y(self, value: float) -> None:
+        """Set y in the positive domain."""
         if value < 0:
             raise ValueError(
-                "LightRay.y < 0 is invalid. Use LightRay.reflected attribute."
+                "Bernoulli.y < 0 is invalid. Use Bernoulli.reflected attribute."
             )
         self._y = value
 
@@ -90,10 +94,11 @@ class LightRay:
             raise ValueError("Angle outside of the domain.")
         self.x = self.y / math.tan(value)
 
-    def get_other_angle(self) -> float:
+    def get_incidence(self) -> float:
         """
         Since Ray is a vector, to calculate its angle we imagine a right triangle. This
-        function returns the other angle of that triangle.
+        function returns the other angle of that triangle. It can be imagines as the
+        incidence angle.
         """
         angle = self.angle
         return math.pi / 2 - angle
@@ -101,35 +106,23 @@ class LightRay:
 
     def propagate(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """
-        Propagate the ray from medium1 to medium2.
+        Propagate the ray from medium1 to medium2. Assume reflection under critical
+        angle. Can only reflect once. Total internal reflection occurs when v2 > v1.
 
         Determine whether light can refract using the Law of Refraction:
             sin(alpha_1) / sin(alpha_2) = v1 / v2,
             alpha_2 = arcsin(v2 / v1 * sin(alpha_1)).
-        If out of domain return False, otherwise True.
-
-        Reflect the ray using the Law of Reflection:
+        If out of domain reflect using the Law of Reflection:
             alpha_1 = alpha_2.
-
-        Refract the ray from medium1 to medium2 using the Law of Refraction:
             sin(alpha_1) / sin(alpha_2) = v1 / v2.
-        The propagate method should be used directly instead of this, as light is not
-        always able to refract.
-
-        Assume reflection under critical angle.
-
-        Can only reflect once. Total internal reflection occurs when v2 > v1.
         """
-        alpha_1 = self.get_other_angle()
+        alpha_1 = self.get_incidence()
         v1, v2 = medium1.v, medium2.v
         w = (v2 / v1) * math.sin(alpha_1)
         if abs(w) >= 1 and v2 > v1:
             self.reflected = True
-            # self.y = -self.y
         else:  # refract
             w = math.asin(w)
-            # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
-            # self.set_angle(alpha_2)
             self.angle = w
 
     def __repr__(self) -> str:
@@ -164,24 +157,3 @@ class ConstructBrachistochrone:
 #         y += ray.y
 #         points.append((x, y))
 #     return points
-
-
-# def plot(
-#     points: list[tuple[float, float]], medium_height: float, file_path=None, save=False
-# ) -> hv.core.layout.Layout:
-#     alim = np.max(np.abs(np.array(points)))
-#     # lines = hv.HLines(-np.arange(0, alim, medium_height)).opts(
-#     #     color="lightgray", line_width=1
-#     # )
-
-#     pad = 1e-1
-#     xlim = (-alim * pad, alim + alim * pad)
-#     ylim = (-alim - alim * pad, alim * pad)
-#     curve = hv.Curve(points).opts(xlim=xlim, ylim=ylim, height=650, width=650)
-
-#     # res = lines * curve
-#     res = curve
-#     if save:
-#         # show(hv.render(res))
-#         hv.save(res, file_path, fmt="png")
-#     return res

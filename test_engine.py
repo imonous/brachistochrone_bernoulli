@@ -2,7 +2,7 @@ import pytest
 import math
 import random
 
-from engine import LightRay, LightMedium
+from engine import BernoulliRay, LightMedium
 
 
 @pytest.fixture
@@ -25,8 +25,8 @@ def rand_xy():
     ],
 )
 def test_angle_getter_result(x, y, expected):
-    ray = LightRay(x, y)
-    assert ray.angle == pytest.approx(expected, abs=1e-5)
+    r = BernoulliRay(x, y)
+    assert r.angle == pytest.approx(expected, abs=1e-5)
 
 
 @pytest.mark.parametrize(
@@ -40,7 +40,7 @@ def test_angle_getter_result(x, y, expected):
 )
 def test_angle_getter_fails(test_input):
     with pytest.raises(ValueError):
-        LightRay(*test_input)
+        BernoulliRay(*test_input)
 
 
 # depends on engine.angle getter
@@ -50,20 +50,20 @@ def test_angle_getter_fails(test_input):
     + [random.uniform(1e-10, math.pi / 2) for _ in range(10)],  # any angle
 )
 def test_angle_setter_result(rand_xy, angle):
-    ray = LightRay(*rand_xy)
-    ray.angle = angle
-    assert angle == pytest.approx(ray.angle)
+    r = BernoulliRay(*rand_xy)
+    r.angle = angle
+    assert angle == pytest.approx(r.angle)
 
 
 @pytest.mark.parametrize("angle", [0, math.pi / 2 + 1e-1, math.pi, -math.pi])
 def test_angle_setter_fails(rand_xy, angle):
-    ray = LightRay(*rand_xy)
+    r = BernoulliRay(*rand_xy)
     with pytest.raises(ValueError):
-        ray.angle = angle
+        r.angle = angle
 
 
 # too simple of a function to test
-def test_get_other_angle():
+def test_get_incidence():
     assert True
 
 
@@ -89,10 +89,10 @@ def test_get_other_angle():
 def test_propagate_refract_results(rand_xy, n1, n2, incidence, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
-    ray = LightRay(*rand_xy)
-    ray.angle = math.pi / 2 - incidence  # set incidence angle
-    ray.propagate(m1, m2)
-    assert pytest.approx(ray.angle) == expected
+    r = BernoulliRay(*rand_xy)
+    r.angle = math.pi / 2 - incidence  # set incidence angle
+    r.propagate(m1, m2)
+    assert pytest.approx(r.angle) == expected
 
 
 # depends on engine.LightMedum, engine.set_angle
@@ -113,7 +113,7 @@ def test_propagate_refract_results(rand_xy, n1, n2, incidence, expected):
 def test_propagate_reflect_results(rand_xy, n1, n2, incidence, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
-    r = LightRay(*rand_xy)
+    r = BernoulliRay(*rand_xy)
     r.angle = math.pi / 2 - incidence
     r.propagate(m1, m2)
     assert r.reflected == expected

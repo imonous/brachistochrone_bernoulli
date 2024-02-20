@@ -17,3 +17,23 @@ angle_slider = pn.widgets.FloatSlider(
 
 app = pn.Row(angle_slider, plot)
 app.servable()
+
+# def plot(
+#     points: list[tuple[float, float]], medium_height: float, file_path=None, save=False
+# ) -> hv.core.layout.Layout:
+#     alim = np.max(np.abs(np.array(points)))
+#     # lines = hv.HLines(-np.arange(0, alim, medium_height)).opts(
+#     #     color="lightgray", line_width=1
+#     # )
+
+#     pad = 1e-1
+#     xlim = (-alim * pad, alim + alim * pad)
+#     ylim = (-alim - alim * pad, alim * pad)
+#     curve = hv.Curve(points).opts(xlim=xlim, ylim=ylim, height=650, width=650)
+
+#     # res = lines * curve
+#     res = curve
+#     if save:
+#         # show(hv.render(res))
+#         hv.save(res, file_path, fmt="png")
+#     return res
