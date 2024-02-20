@@ -24,37 +24,42 @@ def rand_xy():
         (120, 1.3, 0.01083),
     ],
 )
-def test_get_angle_result(x, y, expected):
+def test_angle_getter_result(x, y, expected):
     ray = LightRay(x, y)
-    assert ray.get_angle() == pytest.approx(expected, abs=1e-5)
+    assert ray.angle == pytest.approx(expected, abs=1e-5)
 
 
-# (-0.75, 8, math.pi - 1.47731),
-# (-0.75, -8, 1.47731 - math.pi),
-# (0.75, -8, -1.47731),
-@pytest.mark.parametrize("test_input", [(0, 0)])
-def test_get_angle_fails(test_input):
+@pytest.mark.parametrize(
+    "test_input",
+    [
+        (0, 0),
+        (-0.75, 8),
+        (-0.75, -8),
+        (0.75, -8),
+    ],
+)
+def test_angle_getter_fails(test_input):
     with pytest.raises(ValueError):
         LightRay(*test_input)
 
 
-# depends on engine.get_angle
+# depends on engine.angle getter
 @pytest.mark.parametrize(
     "angle",
     [random.uniform(1e-50, 1e-10) for _ in range(10)]  # small angle
     + [random.uniform(1e-10, math.pi / 2) for _ in range(10)],  # any angle
 )
-def test_set_angle_result(rand_xy, angle):
+def test_angle_setter_result(rand_xy, angle):
     ray = LightRay(*rand_xy)
-    ray.set_angle(angle)
-    assert angle == pytest.approx(ray.get_angle())
+    ray.angle = angle
+    assert angle == pytest.approx(ray.angle)
 
 
 @pytest.mark.parametrize("angle", [0, math.pi / 2 + 1e-1, math.pi, -math.pi])
-def test_set_angle_fail(rand_xy, angle):
+def test_angle_setter_fails(rand_xy, angle):
     ray = LightRay(*rand_xy)
     with pytest.raises(ValueError):
-        ray.set_angle(angle)
+        ray.angle = angle
 
 
 # too simple of a function to test
@@ -85,9 +90,9 @@ def test_propagate_refract_results(rand_xy, n1, n2, incidence, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
     ray = LightRay(*rand_xy)
-    ray.set_angle(math.pi / 2 - incidence)  # set incidence angle
+    ray.angle = math.pi / 2 - incidence  # set incidence angle
     ray.propagate(m1, m2)
-    assert pytest.approx(ray.get_angle()) == expected
+    assert pytest.approx(ray.angle) == expected
 
 
 # depends on engine.LightMedum, engine.set_angle
@@ -109,7 +114,7 @@ def test_propagate_reflect_results(rand_xy, n1, n2, incidence, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
     r = LightRay(*rand_xy)
-    r.set_angle(math.pi / 2 - incidence)
+    r.angle = math.pi / 2 - incidence
     r.propagate(m1, m2)
     assert r.reflected == expected
 

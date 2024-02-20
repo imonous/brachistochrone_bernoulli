@@ -75,29 +75,27 @@ class LightRay:
             )
         self._y = value
 
-    def get_angle(self) -> float:
-        """Get the angle of the vector."""
+    @property
+    def angle(self) -> float:
+        """Get the angle of the vector. Caching would add unnecessary complexity."""
         return math.atan2(self.y, self.x)
 
-    def set_angle(self, angle: float) -> None:
+    @angle.setter
+    def angle(self, value: float) -> None:
         """
-        Set the angle of the vector in the range [-pi / 2, pi / 2]. If the sign of angle
-        does not change, alter x. Otherwise, alter y and or x.
-
-        Angle is calculated in terms of tan(y/x).
+        Set the angle of the vector in the range (0, pi / 2). Angle is calculated in
+        terms of tan(y/x). Keep y, alter x.
         """
-        if angle > math.pi / 2 or angle <= 0:
+        if value >= math.pi / 2 or value <= 0:
             raise ValueError("Angle outside of the domain.")
-        # if math.copysign(angle, self.get_angle()) != angle:
-        #     self.y = -self.y
-        self.x = self.y / math.tan(angle)
+        self.x = self.y / math.tan(value)
 
     def get_other_angle(self) -> float:
         """
         Since Ray is a vector, to calculate its angle we imagine a right triangle. This
         function returns the other angle of that triangle.
         """
-        angle = self.get_angle()
+        angle = self.angle
         return math.pi / 2 - angle
         # return math.copysign(math.pi / 2 - abs(angle), angle)
 
@@ -125,21 +123,17 @@ class LightRay:
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = (v2 / v1) * math.sin(alpha_1)
-        if w == 0:
-            raise ValueError("Ege case #1!")
-        if abs(w) >= 1 and v2 <= v1:
-            raise ValueError("Edge case #2!")
-        elif abs(w) >= 1 and v2 > v1:
+        if abs(w) >= 1 and v2 > v1:
             self.reflected = True
             # self.y = -self.y
         else:  # refract
             w = math.asin(w)
             # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
             # self.set_angle(alpha_2)
-            self.set_angle(w)
+            self.angle = w
 
     def __repr__(self) -> str:
-        return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
+        return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.angle:.2e})"
 
 
 class ConstructBrachistochrone:
