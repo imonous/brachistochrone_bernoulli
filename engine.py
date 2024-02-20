@@ -44,10 +44,11 @@ class BernoulliLightMedium(LightMedium):
 
 class LightRay:
     def __init__(self, x: float, y: float) -> None:
-        """Light ray as a vector. Angles are in radians."""
+        """Light ray as a vector in the 1st quadrant. Angles are in radians."""
         if (x, y) == (0, 0):
             raise ValueError("LightRay cannot be a null vector.")
         self.x, self.y = x, y
+        self.reflected = False
 
     def get_angle(self) -> float:
         """Get the angle of the vector."""
@@ -57,11 +58,13 @@ class LightRay:
         """
         Set the angle of the vector in the range [-pi / 2, pi / 2]. If the sign of angle
         does not change, alter x. Otherwise, alter y and or x.
+
+        Angle is calculated in terms of tan(y/x).
         """
-        if abs(angle) > math.pi / 2 or angle == 0:
+        if angle > math.pi / 2 or angle <= 0:
             raise ValueError("Angle outside of the domain.")
-        if math.copysign(angle, self.get_angle()) != angle:
-            self.y = -self.y
+        # if math.copysign(angle, self.get_angle()) != angle:
+        #     self.y = -self.y
         self.x = self.y / math.tan(angle)
 
     def get_other_angle(self) -> float:
@@ -70,7 +73,8 @@ class LightRay:
         function returns the other angle of that triangle.
         """
         angle = self.get_angle()
-        return math.copysign(math.pi / 2 - abs(angle), angle)
+        return math.pi / 2 - angle
+        # return math.copysign(math.pi / 2 - abs(angle), angle)
 
     def propagate(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """Propagate the ray from medium1 to medium2."""
@@ -83,7 +87,8 @@ class LightRay:
         Reflect the ray using the Law of Reflection:
             alpha_1 = alpha_2.
         """
-        self.y = -self.y
+        self.reflected = True
+        # self.y = -self.y
 
     def _refract(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """
@@ -118,6 +123,16 @@ class LightRay:
 
     def __repr__(self) -> str:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
+
+
+class ConstructBKC:
+    def __init__(self):
+        """Construct the Brachistochrone curve (BKC)."""
+        pass
+
+    def step(self):
+        """Step."""
+        pass
 
 
 # def trace_light(
