@@ -92,14 +92,22 @@ class LightRay:
             sin(alpha_1) / sin(alpha_2) = v1 / v2.
         The propagate method should be used directly instead of this, as light is not
         always able to refract.
+
+        Assume reflection under critical angle.
+
+        Can only reflect once. Total internal reflection occurs when v2 > v1.
         """
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = (v2 / v1) * math.sin(alpha_1)
-        if w == 0 or abs(w) > 1:  # no total internal reflectoin
+        if w == 0:
+            raise ValueError("Ege case #1!")
+        if abs(w) >= 1 and v2 <= v1:
+            raise ValueError("Edge case #2!")
+        elif abs(w) >= 1 and v2 > v1:
             self.reflected = True
             # self.y = -self.y
-        else:
+        else:  # refract
             w = math.asin(w)
             # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
             # self.set_angle(alpha_2)
