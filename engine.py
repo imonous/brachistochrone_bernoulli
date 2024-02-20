@@ -44,11 +44,36 @@ class BernoulliLightMedium(LightMedium):
 
 class LightRay:
     def __init__(self, x: float, y: float) -> None:
-        """Light ray as a vector in the 1st quadrant. Angles are in radians."""
+        """Light ray as a vector in the 1st cartesian quadrant. Angles are in radians."""
         if (x, y) == (0, 0):
             raise ValueError("LightRay cannot be a null vector.")
-        self.x, self.y = x, y
+        if x < 0 or y < 0:
+            raise ValueError("LightRay must be in the first (cartesian) quadrant.")
+        self._x, self._y = x, y
         self.reflected = False
+
+    # TODO x, y = 0, 0?
+    @property
+    def x(self) -> float:
+        return self._x
+
+    @x.setter
+    def x(self, value: float) -> None:
+        if value < 0:
+            raise ValueError("LightRay.x < 0 is invalid.")
+        self._x = value
+
+    @property
+    def y(self) -> float:
+        return -1 * self._y if self.reflected else self._y
+
+    @y.setter
+    def y(self, value: float) -> None:
+        if value < 0:
+            raise ValueError(
+                "LightRay.y < 0 is invalid. Use LightRay.reflected attribute."
+            )
+        self._y = value
 
     def get_angle(self) -> float:
         """Get the angle of the vector."""
@@ -117,13 +142,13 @@ class LightRay:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"
 
 
-class ConstructBKC:
+class ConstructBrachistochrone:
     def __init__(self):
-        """Construct the Brachistochrone curve (BKC)."""
+        """Construct the Brachistochrone curve."""
         pass
 
     def step(self):
-        """Step."""
+        """Step forward."""
         pass
 
 
