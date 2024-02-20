@@ -94,10 +94,11 @@ class LightRay:
         """
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
-        w = v2 / v1 * math.sin(alpha_1)
+        w = (v2 / v1) * math.sin(alpha_1)
         w = math.asin(w)
-        alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
-        self.set_angle(alpha_2)
+        # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
+        # self.set_angle(alpha_2)
+        self.set_angle(w)
 
     def can_refract(
         self, medium1: type[LightMedium], medium2: type[LightMedium]

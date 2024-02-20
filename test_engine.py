@@ -70,9 +70,9 @@ def test_set_angle_fail(angle):
         (1.000293, 1.000293, 0.7853981633974483, 0.785398),
         (1.333, 1.000293, 0.7853981633974483, 1.229427),
         # n1 <= n2
-        # (1, 1.000293, 0.7853981633974483, 0.785105),
-        # (1.229427, 2.419, 0.7853981633974483, 0.7853981633974483),
-        # (1.229427, 2.419, 0.5235987755982988, 0.279138),
+        (1, 1.000293, 0.7853981633974483, 0.785105),
+        (1.333, 2.419, 0.7853981633974483, 0.400256),
+        (1.333, 2.419, 0.5235987755982988, 0.279138),
         # https://www.allaboutcircuits.com/tools/snells-law-calculator-snells-law-equation/
         # https://www.translatorscafe.com/unit-converter/de-DE/calculator/snell-law/
     ],
@@ -81,9 +81,9 @@ def test_refract_results(n1, n2, angle, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
     r = LightRay(1, 1)
-    r.set_angle(angle)
+    r.set_angle(math.pi / 2 - angle)  # set incidence angle
     r._refract(m1, m2)
-    assert pytest.approx(r.get_other_angle()) == expected
+    assert pytest.approx(r.get_angle()) == expected
 
 
 # def test_can_refract():
