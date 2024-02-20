@@ -77,21 +77,17 @@ class LightRay:
         # return math.copysign(math.pi / 2 - abs(angle), angle)
 
     def propagate(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
-        """Propagate the ray from medium1 to medium2."""
-        if self.can_refract(medium1, medium2):
-            return self._refract(medium1, medium2)
-        return self.reflect()
-
-    def reflect(self) -> None:
         """
+        Propagate the ray from medium1 to medium2.
+
+        Determine whether light can refract using the Law of Refraction:
+            sin(alpha_1) / sin(alpha_2) = v1 / v2,
+            alpha_2 = arcsin(v2 / v1 * sin(alpha_1)).
+        If out of domain return False, otherwise True.
+
         Reflect the ray using the Law of Reflection:
             alpha_1 = alpha_2.
-        """
-        self.reflected = True
-        # self.y = -self.y
 
-    def _refract(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
-        """
         Refract the ray from medium1 to medium2 using the Law of Refraction:
             sin(alpha_1) / sin(alpha_2) = v1 / v2.
         The propagate method should be used directly instead of this, as light is not
@@ -100,26 +96,14 @@ class LightRay:
         alpha_1 = self.get_other_angle()
         v1, v2 = medium1.v, medium2.v
         w = (v2 / v1) * math.sin(alpha_1)
-        w = math.asin(w)
-        # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
-        # self.set_angle(alpha_2)
-        self.set_angle(w)
-
-    def can_refract(
-        self, medium1: type[LightMedium], medium2: type[LightMedium]
-    ) -> bool:
-        """
-        Determine whether light can refract using the Law of Refraction:
-            sin(alpha_1) / sin(alpha_2) = v1 / v2,
-            alpha_2 = arcsin(v2 / v1 * sin(alpha_1)).
-        If out of domain return False, otherwise True.
-        """
-        alpha_1 = self.get_other_angle()
-        v1, v2 = medium1.v, medium2.v
-        w = v2 / v1 * math.sin(alpha_1)
         if w == 0 or abs(w) > 1:  # no total internal reflectoin
-            return False
-        return True
+            self.reflected = True
+            # self.y = -self.y
+        else:
+            w = math.asin(w)
+            # alpha_2 = math.copysign(math.pi / 2 - abs(w), w)
+            # self.set_angle(alpha_2)
+            self.set_angle(w)
 
     def __repr__(self) -> str:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.get_angle():.2e})"

@@ -57,8 +57,6 @@ def test_set_angle_fail(angle):
 
 
 # def test_get_other_angle():
-# def test_propagate():
-# def test_reflect():
 
 
 # depends on engine.LightMedum, engine.set_angle, engine.get_other_angle
@@ -77,14 +75,15 @@ def test_set_angle_fail(angle):
         # https://www.translatorscafe.com/unit-converter/de-DE/calculator/snell-law/
     ],
 )
-def test_refract_results(n1, n2, angle, expected):
+def test_propagate_refract_results(n1, n2, angle, expected):
     v1, v2 = LightMedium.n_to_v(n1), LightMedium.n_to_v(n2)
     m1, m2 = LightMedium(v1), LightMedium(v2)
     r = LightRay(1, 1)
     r.set_angle(math.pi / 2 - angle)  # set incidence angle
-    r._refract(m1, m2)
+    r.propagate(m1, m2)
     assert pytest.approx(r.get_angle()) == expected
 
 
-# def test_can_refract():
-# def test_LightMedium():
+# def test_propagate_reflect():
+# def test_propagate_reflect():
+# def test_propagate_fail():
