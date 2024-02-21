@@ -1,8 +1,8 @@
 import math
 import time
+import asyncio
 
 import engine
-import analytics
 
 import panel as pn
 import holoviews as hv
@@ -24,28 +24,32 @@ gconst_slider = pn.widgets.FloatSlider(
 pipe = Pipe(data=[])
 live_plot = hv.DynamicMap(hv.Curve, streams=[pipe])
 
-
-def stop_trace(event):
-    pass
-
-
-def trace_path(event):
-    bkc_data = engine.ConstructBrachistochrone(
-        init_angle=in_angle_slider.value, g=gconst_slider.value
-    )
-    while bkc_data.step():
-        time.sleep(0.5)
-        pipe.send(bkc_data.points)
-
-
+is_tracing = False
 trace_path_btn = pn.widgets.Button(name="Trace path", button_type="primary")
-stop_trace_btn = pn.widgets.Button(name="Stop trace", button_type="primary")
 
-trace_path_btn.on_click(trace_path)
-stop_trace_btn.on_click(stop_trace)
+
+async def trace_path_toggle(event):
+    global is_tracing
+
+    if not is_tracing:
+        is_tracing = True
+        trace_path_btn.name = "Stop trace"
+        bkc_data = engine.ConstructBrachistochrone(
+            init_angle=in_angle_slider.value, g=gconst_slider.value
+        )
+        while bkc_data.step() and is_tracing:
+            time.sleep(0.5)
+            await asyncio.sleep(1)
+            pipe.send(bkc_data.points)
+    else:
+        is_tracing = False
+        trace_path_btn.name = "Trace path"
+
+
+trace_path_btn.on_click(trace_path_toggle)
 
 app = pn.Row(
-    pn.Column(pn.Row(trace_path_btn, stop_trace_btn), in_angle_slider, gconst_slider),
+    pn.Column(pn.Row(trace_path_btn), in_angle_slider, gconst_slider),
     live_plot,
 )
 app.servable()
