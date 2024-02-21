@@ -36,7 +36,7 @@ class BernoulliMedium(LightMedium):
         Set the velocity of the medium in accordance to:
                 v = sqrt(-2 * g * y).
         """
-        self.v = math.sqrt(-2 * self.g * y)
+        self.v = math.sqrt(-2 * g * y)
 
 
 class BernoulliRay:
@@ -125,19 +125,21 @@ class BernoulliRay:
 
 class ConstructBrachistochrone:
     def __init__(
-        self, init_angle: float = math.pi / 2.25, step_height: float = 1e-1
+        self, init_angle: float, step_height: float = 1e-1, g: float = 9.8067
     ) -> None:
-        """Construct the Brachistochrone curve."""
+        """Construct the Brachistochrone curve. Altered cutoff points for velocity."""
         self.ray = BernoulliRay(step_height, init_angle)
         self.x, self.y = self.ray.x, -self.ray.y
         self.points = [(0, 0), (self.x, self.y)]
+
         self.step_height = step_height
+        self.g = g
 
     def step(self) -> bool:
         """Step forward. Returns False when next steps are finished."""
         try:
-            m1 = BernoulliMedium(self.y)
-            m2 = BernoulliMedium(self.y - self.ray.y)
+            m1 = BernoulliMedium(self.y, g=self.g)
+            m2 = BernoulliMedium(self.y - self.ray.y, g=self.g)
             self.ray.propagate(m1, m2)
         except ValueError:
             return False
