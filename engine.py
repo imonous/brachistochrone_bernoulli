@@ -136,8 +136,8 @@ class ConstructBrachistochrone:
     def step(self) -> bool:
         """Step forward. Returns False when next steps are finished."""
         try:
-            m1 = BernoulliMedium(self.y + self.ray.y * 0.3)
-            m2 = BernoulliMedium(self.y - self.ray.y * 0.3)
+            m1 = BernoulliMedium(self.y)
+            m2 = BernoulliMedium(self.y - self.ray.y)
             self.ray.propagate(m1, m2)
         except ValueError:
             return False

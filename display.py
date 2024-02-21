@@ -1,7 +1,9 @@
 import holoviews as hv
-import engine
 import numpy as np
 import math
+
+from analytics import cycloid
+import engine
 
 hv.extension("bokeh")
 
@@ -17,7 +19,9 @@ def plot(
     pad = 1e-1
     xlim = (-alim * pad, alim + alim * pad)
     ylim = (-alim - alim * pad, alim * pad)
-    curve = hv.Curve(points).opts(xlim=xlim, ylim=ylim, height=650, width=650)
+    curve = hv.Curve(points).opts(
+        xlim=xlim, ylim=ylim, height=650, width=650
+    ) * hv.Curve(cycloid(820, 500))
 
     # res = lines * curve
     res = curve
@@ -35,4 +39,6 @@ def main(init_angles: list[float]) -> None:
 
 
 if __name__ == "__main__":
-    main([math.pi / 2.25, math.pi / 2.2, math.pi / 3, math.pi / 2.75])
+    main(
+        [math.pi / 2.01]
+    )  # , math.pi / 2.2, math.pi / 2.25, math.pi / 2.75, math.pi / 3])
