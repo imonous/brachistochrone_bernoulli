@@ -36,7 +36,7 @@ class BernoulliMedium(LightMedium):
         Set the velocity of the medium in accordance to:
                 v = sqrt(-2 * g * y).
         """
-        self.v = math.sqrt(-2 * g * y)
+        self.v = math.sqrt(-2 * self.g * y)
 
 
 class BernoulliRay:

@@ -1,21 +1,26 @@
 import panel as pn
 import math
+
 import engine
+import analytics
+
+import holoviews as hv
 
 pn.extension(design="material")
 
 ITERATIONS = 300000
 MEDIUM_HEIGHT = 0.5
 
-points = engine.trace_light(ITERATIONS, MEDIUM_HEIGHT, -math.pi / 3)
-plot = engine.plot(points, MEDIUM_HEIGHT)
 # bokeh_pane = pn.pane.Bokeh(plot)
+bkc = hv.DynamicMap(analytics.bkc_plot, kdims=["angle", "g"])
+bkc = bkc.redim.range(angle=(math.pi / 2.7, math.pi / 2.2), g=(5, 20))
 
-angle_slider = pn.widgets.FloatSlider(
-    name="Angle", start=0.5, end=89.5, step=0.5, value=45
-)
 
-app = pn.Row(angle_slider, plot)
+# angle_slider = pn.widgets.FloatSlider(
+#     name="Angle", start=0.5, end=89.5, step=0.5, value=45
+# )
+
+app = pn.Row(bkc)
 app.servable()
 
 # def plot(
