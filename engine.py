@@ -2,8 +2,6 @@ import math
 import holoviews as hv
 import numpy as np
 
-# hv.extension("bokeh")
-
 
 class LightMedium:
     def __init__(self, v: float) -> None:
@@ -39,7 +37,6 @@ class BernoulliMedium(LightMedium):
                 v = sqrt(-2 * g * y).
         """
         self.v = math.sqrt(-2 * self.g * y)
-        # self.v = math.sqrt(2 * self.g * y)  # temporary
 
 
 class BernoulliRay:
@@ -100,8 +97,7 @@ class BernoulliRay:
         function returns the other angle of that triangle. It can be imagines as the
         incidence angle.
         """
-        angle = self.angle
-        return math.pi / 2 - angle
+        return math.pi / 2 - self.angle
 
     def propagate(self, medium1: type[LightMedium], medium2: type[LightMedium]) -> None:
         """
@@ -117,12 +113,11 @@ class BernoulliRay:
         """
         alpha_1 = self.get_incidence()
         v1, v2 = medium1.v, medium2.v
-        w = (v2 / v1) * math.sin(alpha_1)
-        if abs(w) >= 1 and v2 > v1:  # reflect
+        alpha_2 = (v2 / v1) * math.sin(alpha_1)
+        if alpha_2 >= 1 and v2 > v1:  # reflect
             self.reflected = True
         else:  # refract
-            w = math.asin(w)
-            self.angle = w
+            self.angle = math.pi / 2 - math.asin(alpha_2)
 
     def __repr__(self) -> str:
         return f"LightRay(x={self.x:.2e}, y={self.y:.2e}, angle={self.angle:.2e})"
@@ -130,24 +125,25 @@ class BernoulliRay:
 
 class ConstructBrachistochrone:
     def __init__(
-        self, init_angle: float = math.pi / 3, step_height: float = 1e-1
+        self, init_angle: float = math.pi / 2.25, step_height: float = 1e-1
     ) -> None:
         """Construct the Brachistochrone curve."""
-        self.x, self.y = 0, 0
-        self.points = [(self.x, self.y)]
         self.ray = BernoulliRay(step_height, init_angle)
+        self.x, self.y = self.ray.x, -self.ray.y
+        self.points = [(0, 0), (self.x, self.y)]
         self.step_height = step_height
 
-    def step(self) -> None:
-        """Step forward."""
+    def step(self) -> bool:
+        """Step forward. Returns False when next steps are finished."""
         try:
-            m1 = BernoulliMedium(self.y - self.ray.y)
-            m2 = BernoulliMedium(
-                self.y - 2 * self.ray.y
-            )  # shift forw by 1 for init err
+            m1 = BernoulliMedium(self.y + self.ray.y * 0.3)
+            m2 = BernoulliMedium(self.y - self.ray.y * 0.3)
             self.ray.propagate(m1, m2)
-            self.x += self.ray.x
-            self.y -= self.ray.y
-            self.points.append((self.x, self.y))
         except ValueError:
-            raise StopIteration("Final step reached.")
+            return False
+
+        self.x += self.ray.x
+        self.y -= self.ray.y
+        self.points.append((self.x, self.y))
+
+        return True
