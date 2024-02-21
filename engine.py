@@ -151,23 +151,3 @@ class ConstructBrachistochrone:
             self.points.append((self.x, self.y))
         except ValueError:
             raise StopIteration("Final step reached.")
-
-
-# def trace_light(
-#     iterations: int, medium_height: float, init_angle: float
-# ) -> list[tuple[float, float]]:
-#     ray = LightRay(x=0, y=-medium_height)
-#     ray.set_angle(init_angle)
-#     x, y = 0, ray.y
-#     points = [(0, 0), (ray.x, ray.y)]
-#     m1, m2 = BernoulliLightMedium(0), BernoulliLightMedium(0)
-#     for _ in range(iterations):
-#         if y + ray.y >= 0:
-#             break
-#         m1.set_v(y)
-#         m2.set_v(y + ray.y)
-#         ray.propagate(m1, m2)
-#         x += ray.x
-#         y += ray.y
-#         points.append((x, y))
-#     return points
