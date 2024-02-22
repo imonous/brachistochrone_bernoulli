@@ -3,6 +3,7 @@ import time
 import asyncio
 
 import numpy as np
+import pandas as pd
 from colour import Color
 
 import engine
@@ -44,7 +45,7 @@ live_plot = colored_container * hv.DynamicMap(hv.Curve, streams=[pipe]).opts(
     width=1400, height=800, color="#f0dd13", alpha=1, ylim=(-5, 0)
 )
 
-
+data_to_gather = pd.DataFrame({"(x, y)": []})
 is_tracing = False
 trace_path_btn = pn.widgets.Button(name="Trace path", button_type="primary")
 
@@ -61,6 +62,7 @@ async def trace_path_toggle(event):
         while bkc_data.step() and is_tracing:
             await asyncio.sleep(0.8)
             pipe.send(bkc_data.points)
+
     else:
         is_tracing = False
         trace_path_btn.name = "Trace path"
@@ -69,7 +71,10 @@ async def trace_path_toggle(event):
 trace_path_btn.on_click(trace_path_toggle)
 
 data_gather_modal = pn.layout.FloatPanel(
-    name="Basic FloatPanel", margin=20, visible=False
+    pn.pane.DataFrame(data_to_gather, width=400),
+    name="Basic FloatPanel",
+    margin=20,
+    visible=False,
 )
 
 
