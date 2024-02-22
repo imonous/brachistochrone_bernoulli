@@ -129,7 +129,9 @@ class ConstructBrachistochrone:
         """Construct the Brachistochrone curve. Altered cutoff points for velocity."""
         self.ray = BernoulliRay(step_height, init_angle)
         self.x, self.y = self.ray.x, -self.ray.y
-        self.points = pd.DataFrame({"x": [0, self.x], "y": [0, self.y]})
+        self.data = pd.DataFrame(
+            {"x": [0, self.x], "y": [0, self.y], "medium_v": [0, 1]}
+        )
 
         self.step_height = step_height
         self.g = g
@@ -145,6 +147,6 @@ class ConstructBrachistochrone:
 
         self.x += self.ray.x
         self.y -= self.ray.y
-        self.points.loc[len(self.points)] = [self.x, self.y]
+        self.data.loc[len(self.data)] = [self.x, self.y, m1.v]
 
         return True

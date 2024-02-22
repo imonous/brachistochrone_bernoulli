@@ -61,7 +61,7 @@ async def trace_path_toggle(event):
         )
         while bkc_data.step() and is_tracing:
             await asyncio.sleep(0.2)
-            pipe.send(bkc_data.points)
+            pipe.send(bkc_data.data)
 
     else:
         is_tracing = False
