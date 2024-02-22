@@ -8,7 +8,7 @@ import panel as pn
 import holoviews as hv
 from holoviews.streams import Pipe
 
-pn.extension(design="material")
+pn.extension("floatpanel", design="material")
 
 in_angle_slider = pn.widgets.FloatSlider(
     name="Initial ray angle",
@@ -48,8 +48,11 @@ async def trace_path_toggle(event):
 
 trace_path_btn.on_click(trace_path_toggle)
 
-app = pn.Row(
-    pn.Column(pn.Row(trace_path_btn), in_angle_slider, gconst_slider),
-    live_plot,
+gather_data_btn = pn.widgets.Button(name="Gather data", button_type="primary")
+
+app = pn.template.VanillaTemplate(
+    title="The Brachistochrone via Bernoulli's Indirect Method",
+    sidebar=[in_angle_slider, gconst_slider, pn.Row(trace_path_btn, gather_data_btn)],
 )
+app.main.append(pn.Row(live_plot))
 app.servable()
