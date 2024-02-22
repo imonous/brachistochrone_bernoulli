@@ -40,12 +40,12 @@ colored_container = hv.Overlay(
     ]
 )
 
-pipe = Pipe(data=[])
+pipe = Pipe(data=pd.DataFrame({"x": [], "y": []}))
 live_plot = colored_container * hv.DynamicMap(hv.Curve, streams=[pipe]).opts(
-    width=1400, height=800, color="#f0dd13", alpha=1, ylim=(-5, 0)
+    width=1000, height=600, color="#f0dd13", alpha=1, ylim=(-5, 0)
 )
+live_data = hv.DynamicMap(hv.Table, streams=[pipe]).opts(height=800)
 
-data_to_gather = pd.DataFrame({"(x, y)": []})
 is_tracing = False
 trace_path_btn = pn.widgets.Button(name="Trace path", button_type="primary")
 
@@ -60,7 +60,7 @@ async def trace_path_toggle(event):
             init_angle=in_angle_slider.value, g=gconst_slider.value
         )
         while bkc_data.step() and is_tracing:
-            await asyncio.sleep(0.8)
+            await asyncio.sleep(0.2)
             pipe.send(bkc_data.points)
 
     else:
@@ -70,24 +70,20 @@ async def trace_path_toggle(event):
 
 trace_path_btn.on_click(trace_path_toggle)
 
-data_gather_modal = pn.layout.FloatPanel(
-    pn.pane.DataFrame(data_to_gather, width=400),
-    name="Basic FloatPanel",
-    margin=20,
-    visible=False,
-)
+# data_gather_modal = pn.layout.FloatPanel(
+#     pn.pane.DataFrame(data_to_gather, width=400),
+#     name="Basic FloatPanel",
+#     margin=20,
+#     visible=False,
+# )
 
 
-async def gather_data(event):
-    data_gather_modal.visible = True
+# async def gather_data(event):
+#     data_gather_modal.visible = True
 
 
 gather_data_btn = pn.widgets.Button(name="Gather data", button_type="primary")
-gather_data_btn.on_click(gather_data)
-
-w1 = pn.widgets.TextInput(name="Text:")
-w2 = pn.widgets.FloatSlider(name="Slider")
-
+# gather_data_btn.on_click(gather_data)
 
 app = pn.template.VanillaTemplate(
     title="The Brachistochrone via Bernoulli's Indirect Method",
@@ -98,6 +94,10 @@ app = pn.template.VanillaTemplate(
         pn.Row(trace_path_btn, gather_data_btn),
     ],
 )
-app.main.append(pn.Column(live_plot))
-app.main.append(data_gather_modal)
+app.main.append(
+    pn.Column(
+        pn.Row(live_plot, live_data),
+    )
+)
+# app.main.append(data_gather_modal)
 app.servable()
