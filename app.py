@@ -94,6 +94,12 @@ trace_path_btn.on_click(trace_path_toggle)
 
 def export_data():
     export_data_btn.loading = True
+    filefy = lambda x: str(round(x, 2)).replace(
+        ".", "-"
+    )  # convert a float to a str with - for .
+    export_data_btn.filename = (
+        f"angle{filefy(in_angle_slider.value)}_g{filefy(gconst_slider.value)}.csv"
+    )
     file = io.BytesIO()
     pipe.data.to_csv(file, index=False)
     file.seek(0)
