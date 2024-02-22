@@ -1,6 +1,6 @@
 import math
 import asyncio
-import pathlib
+import time
 
 import io
 
@@ -74,23 +74,19 @@ trace_path_btn.on_click(trace_path_toggle)
 
 def export_data():
     export_data_btn.loading = True
-    file = pathlib.Path("tmp.png")
-    hv.save(live_data, filename=file)
-    with open(file, "rb") as f:
-        contents = f.read()
+    file = io.BytesIO()
+    pipe.data.to_csv(file, index=False)
+    file.seek(0)
+    time.sleep(0.2)  # fake sleep for UX; asyncio fails
     export_data_btn.loading = False
-    return io.BytesIO(contents)
-
-    # svg_64_encode = base64.b64encode(svg.encode())
+    return file
 
 
 export_data_btn = pn.widgets.FileDownload(
-    auto=False,
-    embed=False,
     label="Export data",
     button_type="primary",
     callback=export_data,
-    filename="data_table.png",
+    filename="data.csv",
 )
 
 
