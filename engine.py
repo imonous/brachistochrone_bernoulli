@@ -64,7 +64,7 @@ class BernoulliRay:
     @property
     def y(self) -> float:
         """Negate y if reflected."""
-        return -self._y if self.reflected else self._y
+        return self._y if self.reflected else -self._y
 
     @y.setter
     def y(self, value: float) -> None:
@@ -113,7 +113,7 @@ class BernoulliRay:
         alpha_1 = self.get_incidence()
         v1, v2 = medium1.v, medium2.v
         alpha_2 = (v2 / v1) * math.sin(alpha_1)
-        if alpha_2 >= 1 and v2 > v1:  # reflect
+        if alpha_2 >= 1:  # reflect
             self.reflected = True
         else:  # refract
             self.angle = math.pi / 2 - math.asin(alpha_2)
@@ -128,13 +128,13 @@ class ConstructBrachistochrone:
     ) -> None:
         """Construct the Brachistochrone curve. Altered cutoff points for velocity."""
         self.ray = BernoulliRay(step_height, init_angle)
-        self.x, self.y = self.ray.x, -self.ray.y
+        self.x, self.y = self.ray.x, self.ray.y
         self.data = pd.DataFrame(
             {
                 "x, m": [0, self.x],
                 "y, m": [0, self.y],
                 "Medium velocity, m/s": [
-                    BernoulliMedium(self.y + self.ray.y * 0.5).v,
+                    0,
                     BernoulliMedium(self.y - self.ray.y * 0.5).v,
                 ],
             }
@@ -142,18 +142,23 @@ class ConstructBrachistochrone:
 
         self.step_height = step_height
         self.g = g
+        self.reflect_occured = True
 
     def step(self) -> bool:
         """Step forward. Returns False when next steps are finished."""
-        try:
-            m1 = BernoulliMedium(self.y + self.ray.y * 0.5, g=self.g)
-            m2 = BernoulliMedium(self.y - self.ray.y * 0.5, g=self.g)
-            self.ray.propagate(m1, m2)
-        except ValueError:
+        if self.y + self.ray.y > 0:
             return False
+        m1 = BernoulliMedium(self.y - self.ray.y * 0.5, g=self.g)
+        m2 = BernoulliMedium(self.y + self.ray.y * 0.5, g=self.g)
+        self.ray.propagate(m1, m2)
 
         self.x += self.ray.x
-        self.y -= self.ray.y
-        self.data.loc[len(self.data)] = [self.x, self.y, m1.v]
+        self.y += self.ray.y
+
+        if self.ray.reflected and self.reflect_occured:
+            m2 = m1
+            self.reflect_occured = False
+
+        self.data.loc[len(self.data)] = [self.x, self.y, m2.v]
 
         return True
