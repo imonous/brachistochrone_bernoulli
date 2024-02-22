@@ -1,8 +1,9 @@
 import math
-import time
 import asyncio
+import pathlib
 
-import numpy as np
+import io
+
 import pandas as pd
 from colour import Color
 
@@ -47,7 +48,6 @@ live_plot = colored_container * hv.DynamicMap(hv.Curve, streams=[pipe]).opts(
 live_data = hv.DynamicMap(hv.Table, streams=[pipe]).opts(height=800)
 
 is_tracing = False
-trace_path_btn = pn.widgets.Button(name="Trace path", button_type="primary")
 
 
 async def trace_path_toggle(event):
@@ -68,22 +68,31 @@ async def trace_path_toggle(event):
         trace_path_btn.name = "Trace path"
 
 
+trace_path_btn = pn.widgets.Button(name="Trace path", button_type="primary")
 trace_path_btn.on_click(trace_path_toggle)
 
-# data_gather_modal = pn.layout.FloatPanel(
-#     pn.pane.DataFrame(data_to_gather, width=400),
-#     name="Basic FloatPanel",
-#     margin=20,
-#     visible=False,
-# )
+
+def export_data():
+    export_data_btn.loading = True
+    file = pathlib.Path("tmp.png")
+    hv.save(live_data, filename=file)
+    with open(file, "rb") as f:
+        contents = f.read()
+    export_data_btn.loading = False
+    return io.BytesIO(contents)
+
+    # svg_64_encode = base64.b64encode(svg.encode())
 
 
-# async def gather_data(event):
-#     data_gather_modal.visible = True
+export_data_btn = pn.widgets.FileDownload(
+    auto=False,
+    embed=False,
+    label="Export data",
+    button_type="primary",
+    callback=export_data,
+    filename="data_table.png",
+)
 
-
-gather_data_btn = pn.widgets.Button(name="Gather data", button_type="primary")
-# gather_data_btn.on_click(gather_data)
 
 app = pn.template.VanillaTemplate(
     title="The Brachistochrone via Bernoulli's Indirect Method",
@@ -91,7 +100,7 @@ app = pn.template.VanillaTemplate(
         in_angle_slider,
         gconst_slider,
         pn.layout.Divider(),
-        pn.Row(trace_path_btn, gather_data_btn),
+        pn.Row(trace_path_btn, export_data_btn),
     ],
 )
 app.main.append(
@@ -99,5 +108,4 @@ app.main.append(
         pn.Row(live_plot, live_data),
     )
 )
-# app.main.append(data_gather_modal)
 app.servable()
