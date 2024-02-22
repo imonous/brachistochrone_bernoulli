@@ -130,7 +130,14 @@ class ConstructBrachistochrone:
         self.ray = BernoulliRay(step_height, init_angle)
         self.x, self.y = self.ray.x, -self.ray.y
         self.data = pd.DataFrame(
-            {"x": [0, self.x], "y": [0, self.y], "medium_v": [0, 1]}
+            {
+                "x, m": [0, self.x],
+                "y, m": [0, self.y],
+                "Medium velocity, m/s": [
+                    BernoulliMedium(self.y + self.ray.y * 0.5).v,
+                    BernoulliMedium(self.y - self.ray.y * 0.5).v,
+                ],
+            }
         )
 
         self.step_height = step_height
@@ -139,8 +146,8 @@ class ConstructBrachistochrone:
     def step(self) -> bool:
         """Step forward. Returns False when next steps are finished."""
         try:
-            m1 = BernoulliMedium(self.y, g=self.g)
-            m2 = BernoulliMedium(self.y - self.ray.y, g=self.g)
+            m1 = BernoulliMedium(self.y + self.ray.y * 0.5, g=self.g)
+            m2 = BernoulliMedium(self.y - self.ray.y * 0.5, g=self.g)
             self.ray.propagate(m1, m2)
         except ValueError:
             return False
