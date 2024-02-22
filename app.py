@@ -23,11 +23,11 @@ in_angle_slider = pn.widgets.FloatSlider(
     value=math.pi / 2.4,
 )
 gconst_slider = pn.widgets.FloatSlider(
-    name="Gravitational Acceleration (m/s^2)", start=1, end=20, step=1, value=9.81
+    name="Gravitational Acceleration (m/s^2)", start=1, end=100, step=1, value=9.81
 )
 
 medium_height = 1e-1
-N_mediums = 50  # max ray angle = 1.43
+N_mediums = 10  # max ray angle = 1.43
 gradient = list(
     Color("#34cceb").range_to(Color("#d334eb"), N_mediums)
 )  # cyan to violet
@@ -76,7 +76,7 @@ async def start_trace():
         init_angle=in_angle_slider.value, g=gconst_slider.value
     )
     while bkc_data.step() and is_tracing:
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.05)
         pipe.send(bkc_data.data)
     return await stop_trace()
 
