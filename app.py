@@ -68,14 +68,21 @@ async def trace_path_toggle(event):
 
 trace_path_btn.on_click(trace_path_toggle)
 
+data_gather_modal = pn.layout.FloatPanel(
+    name="Basic FloatPanel", margin=20, visible=False
+)
+
+
+async def gather_data(event):
+    data_gather_modal.visible = True
+
+
 gather_data_btn = pn.widgets.Button(name="Gather data", button_type="primary")
+gather_data_btn.on_click(gather_data)
 
 w1 = pn.widgets.TextInput(name="Text:")
 w2 = pn.widgets.FloatSlider(name="Slider")
 
-floatpanel = pn.layout.FloatPanel(
-    w1, w2, name="Basic FloatPanel", margin=20, status="closed"
-)
 
 app = pn.template.VanillaTemplate(
     title="The Brachistochrone via Bernoulli's Indirect Method",
@@ -86,5 +93,6 @@ app = pn.template.VanillaTemplate(
         pn.Row(trace_path_btn, gather_data_btn),
     ],
 )
-app.main.append(pn.Row(live_plot))
+app.main.append(pn.Column(live_plot))
+app.main.append(data_gather_modal)
 app.servable()
