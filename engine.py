@@ -135,7 +135,7 @@ class ConstructBrachistochrone:
                 "y, m": [0, self.y],
                 "Medium velocity, m/s": [
                     0,
-                    BernoulliMedium(self.y - self.ray.y * 0.5).v,
+                    BernoulliMedium(self.y - self.ray.y * 0.5, g=g).v,
                 ],
             }
         )
