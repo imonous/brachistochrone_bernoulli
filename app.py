@@ -27,7 +27,7 @@ gconst_slider = pn.widgets.FloatSlider(
 )
 
 medium_height = 1e-1
-N_mediums = 10  # max ray angle = 1.43
+N_mediums = 50  # max ray angle = 1.43
 gradient = list(
     Color("#34cceb").range_to(Color("#d334eb"), N_mediums)
 )  # cyan to violet

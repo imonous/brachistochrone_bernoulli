@@ -103,8 +103,9 @@ if __name__ == "__main__":
     #     data.loc[len(data)] = [g, *trials, avg, abs_unc, rel_unc]
     # save_table(data, "./data/processed_data.png", height=140, width=620)
 
-    df = pd.read_csv("./data/angle1-31_g9-81_0.csv")
-    theory_data = cycloid(0.25, len(df))
+    # df = pd.read_csv("./data/angle1-31_g9-81_0.csv")
+    df = pd.read_csv("./data/angle1-43_g9-81.csv")
+    theory_data = cycloid(1.33, len(df))
 
     # theory = hv.Curve(theory_data)
     # experiment = hv.Curve(df)
